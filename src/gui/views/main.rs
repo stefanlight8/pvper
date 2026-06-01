@@ -15,6 +15,7 @@ use crate::{
         widget::frag::frag,
     },
     journals::get_journals,
+    settings::Settings,
 };
 
 pub struct MainState {
@@ -42,13 +43,13 @@ impl MainState {
         }
     }
 
-    pub fn update(&mut self, message: MainMessage) -> Task<MainMessage> {
+    pub fn update(&mut self, settings: &Settings, message: MainMessage) -> Task<MainMessage> {
         match message {
             MainMessage::Scan => {
-                return Task::perform(get_journals("test"), |res| {
+                return Task::perform(get_journals(settings.journals_path()), |res| {
                     match res {
                         Ok(journals) => MainMessage::Journals(journals),
-                        Err(err) => MainMessage::Error, // TODO: error
+                        Err(_err) => MainMessage::Error, // TODO: error
                     }
                 });
             }
@@ -56,7 +57,7 @@ impl MainState {
                 return Task::batch(journals.iter().cloned().map(|path| {
                     Task::stream(scan_journal(path)).map(|res| match res {
                         Ok(frag) => MainMessage::Frag(frag),
-                        Err(err) => MainMessage::Error, // TODO: error
+                        Err(_err) => MainMessage::Error, // TODO: error
                     })
                 }));
             }
