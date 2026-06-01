@@ -1,5 +1,11 @@
+[profile.release]
+lto = true
+codegen-units = 1
+panic = 'abort'
+strip = true
+
 [package]
-name = "pvper"
+name = "pvped"
 version = "0.1.0"
 edition = "2024"
 
