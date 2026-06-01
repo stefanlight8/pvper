@@ -1,4 +1,4 @@
-![Screenshot](./assets/screenshot 1.png)
+![Screenshot](assets/screenshot_1.png)
 
 pvped – a small app for Elite Dangerous's PVP statistics.
 
