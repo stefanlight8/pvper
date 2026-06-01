@@ -1,4 +1,4 @@
-use iced::Task;
+use iced::{Task, Theme};
 
 use crate::gui::{
     element::Element,
@@ -25,11 +25,15 @@ impl State {
         }
     }
 
+    pub fn theme(&self) -> Theme {
+        Theme::KanagawaDragon
+    }
+
     pub fn update(&mut self, message: Message) -> Task<Message> {
         match message {
             Message::Main(message) => match message {
                 MainMessage::Settings => self.screen = Screen::Settings,
-                message => self.main.update(message),
+                message => return self.main.update(message).map(Message::Main),
             },
             Message::Settings(_) => (),
             Message::Screen(screen) => {

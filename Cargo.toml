@@ -6,8 +6,10 @@ edition = "2024"
 [dependencies]
 async-stream = "0.3.6"
 chrono = { version = "0.4.44", features = ["serde"] }
-edjr = { version = "0.1.4", features = ["tokio", "stream", "pvp", "died"] }
+edjr = { version = "0.1.4", features = ["tokio", "stream", "pvp", "died", "loadout"] }
 futures-lite = "2.6.1"
 iced = { version = "0.14.0", features = ["tokio"] }
 iced_plot = "0.4.0"
 tokio = { version = "1.52.3", features = ["fs", "rt-multi-thread", "macros", "tracing"] }
+tracing = "0.1.44"
+tracing-subscriber = { version = "0.3.23", features = ["env-filter"] }
