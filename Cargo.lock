@@ -2481,6 +2481,7 @@ dependencies = [
  "chrono",
  "dirs",
  "edjr",
+ "futures",
  "futures-lite",
  "iced",
  "iced_plot",

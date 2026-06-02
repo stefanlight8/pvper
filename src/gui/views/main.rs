@@ -2,10 +2,10 @@ use iced::{
     Length, Padding, Task,
     widget::{button, column, container, row, scrollable},
 };
-use std::path::PathBuf;
+use std::{cmp::Reverse, path::PathBuf};
 
 use crate::{
-    frags::{Frag, scan_journal},
+    frags::Frag,
     gui::{
         element::Element,
         views::{
@@ -14,7 +14,7 @@ use crate::{
         },
         widget::frag::frag,
     },
-    journals::get_journals,
+    journals::{get_journals, scan_journals},
     settings::Settings,
 };
 
@@ -29,7 +29,7 @@ pub enum MainMessage {
     Scan,
     Settings,
     Journals(Vec<PathBuf>),
-    Frag(Frag),
+    Frags(Vec<Frag>),
     Plot(PlotMessage),
     Error,
 }
@@ -48,28 +48,25 @@ impl MainState {
             MainMessage::Scan => {
                 return Task::perform(get_journals(settings.journals_path()), |res| {
                     match res {
-                        Ok(journals) => MainMessage::Journals(journals),
+                        Ok(mut journals) => {
+                            journals.sort_by(|a, b| b.file_name().cmp(&a.file_name()));
+
+                            MainMessage::Journals(journals)
+                        }
                         Err(_err) => MainMessage::Error, // TODO: error
                     }
                 });
             }
             MainMessage::Journals(journals) => {
-                return Task::batch(journals.iter().cloned().map(|path| {
-                    Task::stream(scan_journal(path)).map(|res| match res {
-                        Ok(frag) => MainMessage::Frag(frag),
-                        Err(_err) => MainMessage::Error, // TODO: error
-                    })
-                }));
+                return Task::stream(scan_journals(journals)).map(|res| match res {
+                    Ok(frag) => MainMessage::Frags(frag),
+                    Err(_err) => MainMessage::Error, // TODO: error
+                });
             }
-            MainMessage::Frag(frag) => {
-                self.statistics.frag(&frag);
-                self.plot.frag(&frag);
-
-                let idx = self
-                    .frags
-                    .binary_search_by(|f| frag.timestamp.cmp(&f.timestamp))
-                    .unwrap_or_else(|e| e);
-                self.frags.insert(idx, frag);
+            MainMessage::Frags(frags) => {
+                self.statistics.frags(frags.clone());
+                self.plot.frags(frags.clone());
+                self.frags.extend(frags);
             }
             MainMessage::Plot(message) => self.plot.update(message),
             _ => (),

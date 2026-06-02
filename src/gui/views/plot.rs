@@ -36,12 +36,15 @@ impl PlotState {
         self.widget.view().map(PlotMessage::Widget).into()
     }
 
-    pub fn frag(&mut self, frag: &Frag) {
-        if frag.is_kill() {
-            self.kills.push(frag.timestamp.clone());
-        } else {
-            self.deaths.push(frag.timestamp.clone());
+    pub fn frags(&mut self, frags: Vec<Frag>) {
+        for frag in frags {
+            if frag.is_kill() {
+                self.kills.push(frag.timestamp);
+            } else {
+                self.deaths.push(frag.timestamp);
+            }
         }
+
         self.rebuild_plot();
     }
 

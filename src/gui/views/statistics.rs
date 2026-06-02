@@ -71,8 +71,8 @@ impl Statistics {
         .spacing(4)
     }
 
-    pub fn frag(&mut self, frag: &Frag) {
-        self.frags.push(frag.clone());
+    pub fn frags(&mut self, frags: Vec<Frag>) {
+        self.frags.extend(frags);
         self.recalculate();
     }
 
