@@ -13,7 +13,13 @@ pub fn frag<'a, Message: 'a>(frag: &'a Frag) -> Container<'a, Message> {
     let killer: Column<'a, Message> = match &frag.killer {
         Target::You => column![
             text("You"),
-            text(format!("{}", frag.ship)).wrapping(Wrapping::WordOrGlyph)
+            text(
+                frag.ship
+                    .as_ref()
+                    .map(|s| s.to_string())
+                    .unwrap_or_default()
+            )
+            .wrapping(Wrapping::WordOrGlyph)
         ]
         .into(), // TODO: replace with one variable
         Target::Player(name) => column![text(name).wrapping(Wrapping::WordOrGlyph)], // TODO: replace with one variable
@@ -21,9 +27,14 @@ pub fn frag<'a, Message: 'a>(frag: &'a Frag) -> Container<'a, Message> {
     let victim: Column<'a, Message> = match &frag.victim {
         Target::You => column![
             text("You").align_x(Alignment::End),
-            text(format!("{}", frag.ship))
-                .align_x(Alignment::End)
-                .wrapping(Wrapping::WordOrGlyph)
+            text(
+                frag.ship
+                    .as_ref()
+                    .map(|s| s.to_string())
+                    .unwrap_or_default()
+            )
+            .align_x(Alignment::End)
+            .wrapping(Wrapping::WordOrGlyph)
         ]
         .align_x(Horizontal::Right)
         .into(), // TODO: replace with one variable
@@ -32,7 +43,15 @@ pub fn frag<'a, Message: 'a>(frag: &'a Frag) -> Container<'a, Message> {
 
     container(
         column![
-            text(frag.timestamp.to_string()),
+            row![
+                text(frag.timestamp.to_string())
+                    .width(Length::Fill)
+                    .wrapping(Wrapping::WordOrGlyph),
+                text(frag.star_system.clone().unwrap_or("Unknown".to_string()))
+                    .width(Length::Fill)
+                    .align_x(Alignment::End)
+                    .wrapping(Wrapping::WordOrGlyph)
+            ],
             row![
                 container(killer)
                     .width(Length::FillPortion(1))

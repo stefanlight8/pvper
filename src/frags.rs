@@ -20,7 +20,8 @@ pub struct Frag {
     pub timestamp: DateTime<Utc>,
     pub killer: Target,
     pub victim: Target,
-    pub ship: Ship,
+    pub star_system: Option<String>,
+    pub ship: Option<Ship>,
 }
 
 impl Frag {
@@ -28,18 +29,30 @@ impl Frag {
         self.victim != Target::You
     }
 
-    pub fn death(timestamp: DateTime<Utc>, ship: Ship, player: String) -> Frag {
+    pub fn death(
+        timestamp: DateTime<Utc>,
+        star_system: Option<String>,
+        ship: Option<Ship>,
+        player: String,
+    ) -> Frag {
         Frag {
             timestamp,
+            star_system,
             ship,
             killer: Target::Player(player),
             victim: Target::You,
         }
     }
 
-    pub fn kill(timestamp: DateTime<Utc>, ship: Ship, player: String) -> Frag {
+    pub fn kill(
+        timestamp: DateTime<Utc>,
+        star_system: Option<String>,
+        ship: Option<Ship>,
+        player: String,
+    ) -> Frag {
         Frag {
             timestamp,
+            star_system,
             ship,
             killer: Target::You,
             victim: Target::Player(player),
@@ -59,14 +72,18 @@ pub fn scan_journal(path: impl AsRef<Path>) -> impl Stream<Item = Result<Frag, S
         let mut stream = journal.stream().boxed();
 
         let mut ship: Option<Ship> = None;
+        let mut star_system: Option<String> = None;
 
         while let Some(Ok(entry)) = stream.next().await {
             match entry.event {
                 JournalEvent::Loadout(event) => {
                     ship = Some(Ship::from(event.ship));
                 }
+                JournalEvent::Location(event) => {
+                    star_system = Some(event.star_system);
+                }
                 JournalEvent::PvpKill(event) => {
-                    yield Ok(Frag::kill(entry.timestamp, ship.clone().unwrap(), event.victim));
+                    yield Ok(Frag::kill(entry.timestamp, star_system.clone(), ship.clone(), event.victim));
                 }
                 JournalEvent::Died(event) => {
                     if let Some(killer_name) = event.killer_name {
@@ -74,12 +91,12 @@ pub fn scan_journal(path: impl AsRef<Path>) -> impl Stream<Item = Result<Frag, S
                             continue
                         }
 
-                        yield Ok(Frag::death(entry.timestamp, ship.clone().unwrap(), strip_cmdr(&killer_name).to_string()));
+                        yield Ok(Frag::death(entry.timestamp, star_system.clone(), ship.clone(), strip_cmdr(&killer_name).to_string()));
                     } else if let Some(killers) = event.killers {
                         let first = killers.into_iter().next();
 
                         if let Some(killer) = first {
-                            yield Ok(Frag::death(entry.timestamp, ship.clone().unwrap(), strip_cmdr(&killer.name).to_string()));
+                            yield Ok(Frag::death(entry.timestamp, star_system.clone(), ship.clone(), strip_cmdr(&killer.name).to_string()));
                         }
                     }
                 }
