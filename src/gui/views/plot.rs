@@ -1,10 +1,10 @@
-use std::collections::BTreeMap;
-
-use crate::{frags::Frag, gui::element::Element};
-
-use chrono::{DateTime, NaiveDate, Utc};
-use iced::Color;
-use iced_plot::{PlotUiMessage, PlotWidget, PlotWidgetBuilder, Series};
+use {
+    crate::{frags::Frag, gui::element::Element},
+    chrono::{DateTime, NaiveDate, Utc},
+    iced::Color,
+    iced_plot::{PlotUiMessage, PlotWidget, PlotWidgetBuilder, Series},
+    std::collections::BTreeMap,
+};
 
 pub struct PlotState {
     widget: PlotWidget,

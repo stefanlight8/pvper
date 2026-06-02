@@ -1,12 +1,16 @@
-use iced::{
-    Alignment, Length,
-    alignment::Horizontal,
-    widget::{column, container, row, text, text::Wrapping},
-};
-
-use crate::{
-    frags::{Frag, Target},
-    gui::element::{Column, Container},
+use {
+    crate::{
+        frags::{Frag, Target},
+        gui::element::{Column, Container},
+    },
+    iced::{
+        Alignment, Length,
+        alignment::Horizontal,
+        widget::{
+            column, container, row,
+            text::{self, Wrapping},
+        },
+    },
 };
 
 pub fn frag<'a, Message: 'a>(frag: &'a Frag) -> Container<'a, Message> {

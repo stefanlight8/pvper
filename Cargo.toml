@@ -24,12 +24,10 @@ targets = ["aarch64-apple-darwin", "x86_64-unknown-linux-gnu", "x86_64-pc-window
 cargo-dist-version = "0.32.0"
 
 [dependencies]
-async-stream = "0.3.6"
 chrono = { version = "0.4.44", features = ["serde"] }
 dirs = "6.0.0"
 edjr = { version = "0.1.4", features = ["tokio", "stream", "pvp", "died", "loadout", "location", "fsd"] }
 futures = "0.3.32"
-futures-lite = "2.6.1"
 iced = { version = "0.14.0", features = ["tokio"] }
 iced_plot = "0.4.0"
 rfd = "0.17.2"

@@ -1,14 +1,14 @@
-use std::path::PathBuf;
-
-use iced::{
-    Task,
-    widget::{button, column, row, text},
-};
-
-use crate::{
-    dialogs::get_directory,
-    gui::{element::Element, views::settings::SettingsMessage::ChangeJournalsPath},
-    settings::Settings,
+use {
+    crate::{
+        dialogs::get_directory,
+        gui::{element::Element, views::settings::SettingsMessage::ChangeJournalsPath},
+        settings::Settings,
+    },
+    iced::{
+        Task,
+        widget::{button, column, row, text},
+    },
+    std::path::PathBuf,
 };
 
 pub struct SettingsState {}

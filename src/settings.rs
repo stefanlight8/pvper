@@ -1,12 +1,12 @@
-use std::path::PathBuf;
-
-use serde::{Deserialize, Serialize};
-use tokio::{
-    fs::{create_dir_all, read, write},
-    io,
+use {
+    crate::fs::user_home,
+    serde::{Deserialize, Serialize},
+    std::path::PathBuf,
+    tokio::{
+        fs::{create_dir_all, read, write},
+        io,
+    },
 };
-
-use crate::fs::user_home;
 
 pub enum SettingsError {
     Io(io::Error),

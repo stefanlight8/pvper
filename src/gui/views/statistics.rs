@@ -1,14 +1,14 @@
-use std::collections::HashSet;
-
-use chrono::{DateTime, Utc};
-use iced::{
-    Length,
-    widget::{column, container, row, text},
-};
-
-use crate::{
-    frags::{Frag, Target},
-    gui::element::{Column, Element},
+use {
+    crate::{
+        frags::{Frag, Target},
+        gui::element::{Column, Element},
+    },
+    chrono::{DateTime, Utc},
+    iced::{
+        Length,
+        widget::{column, container, row, text},
+    },
+    std::collections::HashSet,
 };
 
 fn stat_card<'a, Message: 'a>(label: &'a str, value: String) -> Element<'a, Message> {

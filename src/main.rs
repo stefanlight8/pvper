@@ -8,11 +8,7 @@ mod journals;
 mod settings;
 mod ship;
 
-use std::error::Error;
-
-use dirs::config_dir;
-use tracing_subscriber::EnvFilter;
-
+use {dirs::config_dir, std::error::Error, tracing_subscriber::EnvFilter};
 
 const SETTINGS_FILE: &str = "settings.json";
 

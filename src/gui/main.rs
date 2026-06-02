@@ -1,8 +1,4 @@
-use std::path::PathBuf;
-
-use iced::Result;
-
-use crate::gui::state::State;
+use {crate::gui::state::State, iced::Result, std::path::PathBuf};
 
 pub fn main(config_dir: PathBuf) -> Result {
     iced::application(

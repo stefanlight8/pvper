@@ -1,13 +1,7 @@
-use std::path::Path;
-
-use async_stream::stream;
-use chrono::{DateTime, Utc};
-use edjr::{Journal, JournalEvent};
-use futures_lite::Stream;
-use iced::futures::StreamExt;
-use tokio::fs::File;
-
-use crate::ship::Ship;
+use {
+    crate::ship::Ship,
+    chrono::{DateTime, Utc},
+};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum Target {

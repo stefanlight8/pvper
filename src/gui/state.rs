@@ -1,19 +1,19 @@
-use std::path::PathBuf;
-
-use iced::{Task, Theme};
-
-use crate::{
-    SETTINGS_FILE,
-    gui::{
-        element::Element,
-        message::Message,
-        screen::Screen,
-        views::{
-            main::{MainMessage, MainState},
-            settings::{SettingsMessage, SettingsState},
+use {
+    crate::{
+        SETTINGS_FILE,
+        gui::{
+            element::Element,
+            message::Message,
+            screen::Screen,
+            views::{
+                main::{MainMessage, MainState},
+                settings::{SettingsMessage, SettingsState},
+            },
         },
+        settings::{Settings, SettingsData},
     },
-    settings::{Settings, SettingsData},
+    iced::{Task, Theme},
+    std::path::PathBuf,
 };
 
 pub struct State {

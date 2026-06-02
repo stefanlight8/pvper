@@ -1,21 +1,22 @@
-use iced::{
-    Length, Padding, Task,
-    widget::{button, column, container, row, scrollable},
-};
-use std::{cmp::Reverse, path::PathBuf};
-
-use crate::{
-    frags::Frag,
-    gui::{
-        element::Element,
-        views::{
-            plot::{PlotMessage, PlotState},
-            statistics::Statistics,
+use {
+    crate::{
+        frags::Frag,
+        gui::{
+            element::Element,
+            views::{
+                plot::{PlotMessage, PlotState},
+                statistics::Statistics,
+            },
+            widget::frag::frag,
         },
-        widget::frag::frag,
+        journals::{get_journals, scan_journals},
+        settings::Settings,
     },
-    journals::{get_journals, scan_journals},
-    settings::Settings,
+    iced::{
+        Length, Padding, Task,
+        widget::{button, column, container, row, scrollable},
+    },
+    std::path::PathBuf,
 };
 
 pub struct MainState {
