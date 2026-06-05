@@ -2,11 +2,15 @@ use {
     crate::{frags::Frag, ship::Ship},
     edjr::{Journal, JournalEvent},
     futures::{Stream, StreamExt, stream},
-    std::path::{Path, PathBuf},
+    std::{
+        fmt::Display,
+        path::{Path, PathBuf},
+    },
     tokio::{
         fs::{File, read_dir},
         io::Error,
     },
+    tracing::instrument,
 };
 
 pub async fn get_journals(path: impl AsRef<Path>) -> Result<Vec<PathBuf>, Error> {
@@ -21,15 +25,31 @@ pub async fn get_journals(path: impl AsRef<Path>) -> Result<Vec<PathBuf>, Error>
         }
     }
 
+    tracing::debug!("found {} journals", paths.len());
+
     Ok(paths)
 }
 
+#[derive(Debug)]
 pub enum ScanError {
     Journal(edjr::error::JournalError),
 }
 
+impl std::error::Error for ScanError {}
+
+impl Display for ScanError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            ScanError::Journal(err) => write!(f, "failed to open journal: {}", err),
+        }
+    }
+}
+
+#[instrument(skip_all, fields(path = %path.as_ref().display()))]
 pub async fn scan_journal(path: impl AsRef<Path>) -> Result<Vec<Frag>, ScanError> {
-    let journal = Journal::<File>::open(path)
+    tracing::debug!("reading journal");
+
+    let journal = Journal::<File>::open(&path)
         .await
         .map_err(ScanError::Journal)?;
     let mut stream = journal.stream().boxed();
@@ -38,7 +58,19 @@ pub async fn scan_journal(path: impl AsRef<Path>) -> Result<Vec<Frag>, ScanError
     let mut star_system: Option<String> = None;
     let mut frags = Vec::new();
 
-    while let Some(Ok(entry)) = stream.next().await {
+    while let Some(entry) = stream.next().await {
+        let entry = match entry {
+            Ok(entry) => entry,
+            Err(err) => {
+                tracing::error!(
+                    "failed to read journal ({}): {}",
+                    &path.as_ref().display(),
+                    err
+                );
+                continue;
+            }
+        };
+
         match entry.event {
             JournalEvent::Loadout(event) => {
                 ship = Some(Ship::from(event.ship));
@@ -85,6 +117,8 @@ pub async fn scan_journal(path: impl AsRef<Path>) -> Result<Vec<Frag>, ScanError
             _ => (),
         }
     }
+
+    tracing::debug!("found {} frags", frags.len());
 
     Ok(frags)
 }

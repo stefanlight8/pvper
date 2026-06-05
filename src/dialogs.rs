@@ -4,6 +4,7 @@ use {
 };
 
 pub async fn get_directory() -> Option<PathBuf> {
+    tracing::debug!("creating dialog to get directory");
     let mut dialog = AsyncFileDialog::new().set_title("Choose directory which will be scanned");
 
     if let Ok(path) = env::var("HOME").or_else(|_| env::var("USERPROFILE")) {

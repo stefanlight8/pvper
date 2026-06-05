@@ -8,8 +8,8 @@ use {
 
 pub struct PlotState {
     widget: PlotWidget,
-    kills: Vec<DateTime<Utc>>,
-    deaths: Vec<DateTime<Utc>>,
+    kills: BTreeMap<NaiveDate, i32>,
+    deaths: BTreeMap<NaiveDate, i32>,
 }
 
 #[derive(Debug, Clone)]
@@ -21,8 +21,8 @@ impl PlotState {
     pub fn new() -> PlotState {
         PlotState {
             widget: PlotWidget::default(),
-            kills: Vec::new(),
-            deaths: Vec::new(),
+            kills: BTreeMap::new(),
+            deaths: BTreeMap::new(),
         }
     }
 
@@ -38,29 +38,27 @@ impl PlotState {
 
     pub fn frags(&mut self, frags: Vec<Frag>) {
         for frag in frags {
+            let date = frag.timestamp.date_naive();
+
             if frag.is_kill() {
-                self.kills.push(frag.timestamp);
+                *self.kills.entry(date).or_default() += 1;
             } else {
-                self.deaths.push(frag.timestamp);
+                *self.deaths.entry(date).or_default() += 1;
             }
         }
 
+        tracing::debug!("rebuilding plot");
+        tracing::debug!(kills = self.kills.len(), deaths = self.deaths.len());
         self.rebuild_plot();
     }
 
     fn rebuild_plot(&mut self) {
-        let mut kills_per_day: BTreeMap<NaiveDate, i32> = BTreeMap::new();
-        let mut deaths_per_day: BTreeMap<NaiveDate, i32> = BTreeMap::new();
-
-        for ts in &self.kills {
-            *kills_per_day.entry(ts.date_naive()).or_default() += 1;
+        if self.kills.len() < 2 && self.deaths.len() < 2 {
+            return;
         }
 
-        for ts in &self.deaths {
-            *deaths_per_day.entry(ts.date_naive()).or_default() += 1;
-        }
-
-        let kill_points: Vec<[f64; 2]> = kills_per_day
+        let kill_points: Vec<[f64; 2]> = self
+            .kills
             .iter()
             .map(|(day, count)| {
                 let x = day.and_hms_opt(0, 0, 0).unwrap().and_utc().timestamp() as f64;
@@ -69,7 +67,8 @@ impl PlotState {
             })
             .collect();
 
-        let death_points: Vec<[f64; 2]> = deaths_per_day
+        let death_points: Vec<[f64; 2]> = self
+            .deaths
             .iter()
             .map(|(day, count)| {
                 let x = day.and_hms_opt(0, 0, 0).unwrap().and_utc().timestamp() as f64;
@@ -98,7 +97,6 @@ impl PlotState {
                 let date = DateTime::<Utc>::from_timestamp(x as i64, 0)
                     .map(|dt| dt.format("%d %b, %Y").to_string())
                     .unwrap_or_else(|| "?".into());
-
                 format!("{date} | {y:.0}")
             })
             .build()

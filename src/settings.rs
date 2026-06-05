@@ -43,10 +43,12 @@ impl Default for SettingsData {
 
 impl Settings {
     pub async fn load(path: PathBuf) -> Result<Settings, SettingsError> {
+        tracing::info!("loading settings from: {}", path.display());
         let settings_data: SettingsData;
         let settings: Settings;
 
         if !path.exists() {
+            tracing::info!("settings file doesn't exist, creating");
             settings_data = SettingsData::default();
             settings = Settings::new(path, settings_data);
             settings.save().await?;

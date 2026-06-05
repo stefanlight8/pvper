@@ -54,17 +54,31 @@ impl MainState {
 
                             MainMessage::Journals(journals)
                         }
-                        Err(_err) => MainMessage::Error, // TODO: error
+                        Err(err) => {
+                            tracing::error!("failed to get journals: {}", err);
+
+                            MainMessage::Error
+                        } // TODO: error
                     }
                 });
             }
             MainMessage::Journals(journals) => {
                 return Task::stream(scan_journals(journals)).map(|res| match res {
                     Ok(frag) => MainMessage::Frags(frag),
-                    Err(_err) => MainMessage::Error, // TODO: error
+                    Err(err) => {
+                        tracing::error!("failed to scan journals: {}", err);
+
+                        MainMessage::Error
+                    } // TODO: error
                 });
             }
             MainMessage::Frags(frags) => {
+                tracing::debug!("received frags: {:?}", frags);
+
+                if frags.is_empty() {
+                    return Task::none();
+                }
+
                 self.statistics.frags(frags.clone());
                 self.plot.frags(frags.clone());
                 self.frags.extend(frags);

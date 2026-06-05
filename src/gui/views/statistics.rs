@@ -73,10 +73,13 @@ impl Statistics {
 
     pub fn frags(&mut self, frags: Vec<Frag>) {
         self.frags.extend(frags);
+        tracing::debug!("extended statistics frags");
         self.recalculate();
     }
 
     fn recalculate(&mut self) {
+        tracing::debug!("recalculating statistics");
+
         self.kills = 0;
         self.deaths = 0;
 

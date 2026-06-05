@@ -6,10 +6,7 @@ use {
     iced::{
         Alignment, Length,
         alignment::Horizontal,
-        widget::{
-            column, container, row,
-            text::{self, Wrapping},
-        },
+        widget::{column, container, row, text, text::Wrapping},
     },
 };
 
