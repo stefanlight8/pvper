@@ -124,7 +124,16 @@ pub async fn scan_journal(path: impl AsRef<Path>) -> Result<Vec<Frag>, ScanError
 }
 
 pub fn scan_journals(journals: Vec<PathBuf>) -> impl Stream<Item = Result<Vec<Frag>, ScanError>> {
-    stream::iter(journals).map(scan_journal).buffer_unordered(8)
+    stream::iter(journals)
+        .map(scan_journal)
+        .buffer_unordered(8)
+        .filter_map(|res| async move {
+            match res {
+                Ok(frags) if !frags.is_empty() => Some(Ok(frags)),
+                Ok(_) => None,
+                Err(e) => Some(Err(e)),
+            }
+        })
 }
 
 fn strip_cmdr(content: &str) -> &str {

@@ -36,7 +36,7 @@ impl PlotState {
         self.widget.view().map(PlotMessage::Widget).into()
     }
 
-    pub fn frags(&mut self, frags: Vec<Frag>) {
+    pub fn extend(&mut self, frags: &[Frag]) {
         for frag in frags {
             let date = frag.timestamp.date_naive();
 

@@ -75,12 +75,8 @@ impl MainState {
             MainMessage::Frags(frags) => {
                 tracing::debug!("received frags: {:?}", frags);
 
-                if frags.is_empty() {
-                    return Task::none();
-                }
-
-                self.statistics.frags(frags.clone());
-                self.plot.frags(frags.clone());
+                self.statistics.update(&frags);
+                self.plot.extend(&frags);
                 self.frags.extend(frags);
                 self.frags.sort_by(|a, b| b.timestamp.cmp(&a.timestamp));
             }
