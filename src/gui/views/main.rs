@@ -82,6 +82,7 @@ impl MainState {
                 self.statistics.frags(frags.clone());
                 self.plot.frags(frags.clone());
                 self.frags.extend(frags);
+                self.frags.sort_by(|a, b| b.timestamp.cmp(&a.timestamp));
             }
             MainMessage::Plot(message) => self.plot.update(message),
             _ => (),
